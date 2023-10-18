@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symmetric Drawing</title>
+    <style>
+        body {font-family: 'Young Serif', serif;}
+
+        canvas {
+            display: block;
+            margin: auto;
+            border: 1px solid #000;
+            margin-top: 80px;
+        }
+
+        section {
+            margin: 0;
+        }
+
+        #ticker2 {
+            font-size: 2rem;
+            background: black;
+            color: white;
+            width: 100%;
+            height: 2rem;
+            white-space: nowrap;
+        }
+
+        #ticker3 {
+            font-size: 2rem;
+            background: black;
+            color: white;
+            width: 100%;
+            height: 2rem;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        #a {
+            width: 200px;
+            height: 200px;
+            background: white;
+        }
+    </style>
+</head>
+
+<body>
+    <section>
+        <div id="ticker2" class="ticker" data-speed="2" data-gap="0">
+            <p><span>Decalcomanie Decalcomanie Decalcomanie Decalcomanie Decalcomanie Decalcomanie Decalcomanie Decalcomanie Decalcomanie Decalcomanie </span></p>
+        </div>
+
+        <div id="ticker3" class="ticker" data-speed="2" data-gap="0">
+            <p><span>Decalcomanie Decalcomanie Decalcomanie Decalcomanie Decalcomanie Decalcomanie Decalcomanie Decalcomanie Decalcomanie Decalcomanie </span></p>
+        </div>
+    </section>
+
+    <script type="text/javascript">
+        bhTicker("ticker", 2);
+
+        function bhTicker(cl, speed) {
+            let t = document.getElementsByClassName(cl);
+            let ta = [];
+            let ts = [];
+            let tg = [];
+            let tw = [];
+            let container, mover, text, textWidth;
+
+            for (let i = 0; i < t.length; i++) {
+                container = t[i];
+                mover = container.getElementsByTagName("p").item(0);
+                text = mover.getElementsByTagName("span").item(0);
+
+                // set
+                mover.style.position = "absolute";
+                mover.style.margin = "0 0 0 0";
+                mover.style.left = "0px";
+                mover.leftPosition = 0;
+                mover.style.width = text.childNodes.item(0).length + "em";
+                textWidth = text.offsetWidth;
+
+                let speed2 = t[i].dataset.speed;
+                if (textWidth > container.offsetWidth) {
+                    if (speed2 == 1) {
+                        speed2 = 2
+                    };
+                    mover.style.width = textWidth * speed2 + "px";
+
+                    for (let k = 0; k < speed2; k++) {
+                        mover.innerHTML += mover.innerHTML;
+                    }
+                }
+
+                tw.push(textWidth);
+                tg.push(t[i].dataset.gap);
+                ts.push(t[i].dataset.speed);
+                ta.push(mover);
+            }
+
+            let tickerAction = function () {
+                for (let j = 0; j < ta.length; j++) {
+                    let speed = parseInt(ts[j]);
+                    let gap = parseInt(tg[j]);
+                    let tw2 = tw[j];
+
+                    if (ta[j].leftPosition * -speed > tw2 * speed) {
+                        ta[j].leftPosition = -speed;
+                    } else {
+                        ta[j].leftPosition -= speed;
+                    }
+
+                    ta[j].style.left = (-gap + ta[j].leftPosition) + "px";
+                }
+                window.requestAnimationFrame(tickerAction);
+            };
+            tickerAction();
+        }
+    </script>
+
+    <div id="e">
+    <canvas id="symmetricCanvas" width="1000" height="800"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('symmetricCanvas');
+        const context = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        let drawing = false;
+
+        canvas.onmousedown = function (event) {
+            drawing = true;
+            context.beginPath();
+            context.moveTo(event.clientX - canvas.getBoundingClientRect().left, event.clientY - canvas.getBoundingClientRect().top);
+        };
+
+        canvas.onmouseup = function () {
+            drawing = false;
+        };
+
+        canvas.onmousemove = function (event) {
+            if (!drawing) return;
+
+            const mouseX = event.clientX - canvas.getBoundingClientRect().left;
+            const mouseY = event.clientY - canvas.getBoundingClientRect().top;
+
+            // Draw on the left side
+            context.lineTo(mouseX, mouseY);
+            context.stroke();
+
+            // Draw on the right side
+            const symmetricX = width - mouseX;
+            context.lineTo(symmetricX, mouseY);
+            context.stroke();
+        };
+    </script>
+
+    <input type="color" id="c">canvas color
+<input type="color" id="d">pen color
+<script>
+    c.oninput = function () {
+        canvas.style.backgroundColor = c.value;
+    }
+
+     d.oninput = function () {
+        context.strokeStyle = d.value;
+    }
+</script>
+</body>
+</html>
